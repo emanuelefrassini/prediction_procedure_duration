@@ -25,7 +25,7 @@ To install the required dependencies, run this command:
   pip install -r requirements.txt
   ```
 # Built with
-<img src="./pycache/TensorFlow-Dark.svg" width="48">  
+<img src="./pycache/TensorFlow-Dark.svg" width="48">  <img src="./pycache/Scikit_learn_logo_small.svg" width="48"> <img src="./pycache/NumPy_logo_2020.svg" width="48"> <img src="./pycache/Keras_logo.svg" width="48">  
 
 # Contact
 Emanuele Frassini - ema.frassini@hotmail.com -[Emanuele Frassini](https://www.linkedin.com/in/emanuele-frassini-1a7a37208)
