@@ -24,6 +24,8 @@ To install the required dependencies, run this command:
   ```sh
   pip install -r requirements.txt
   ```
+# Built with
+<img src="./pycache/TensorFlow-Dark.svg" width="48">  
 
 # Contact
 Emanuele Frassini - ema.frassini@hotmail.com -[Emanuele Frassini](https://www.linkedin.com/in/emanuele-frassini-1a7a37208)
