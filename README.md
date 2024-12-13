@@ -17,3 +17,13 @@ Implements state-of-the-art deep learning models, including:
 Benchmarks models based on:
  * Accuracy (MAE, SMAPE)
  * Training and inference times
+
+#Getting Started
+## Prerequisites
+To install the required dependencies, run this command:
+  ```sh
+  pip install -r requirements.txt
+  ```
+
+#Contact
+Emanuele Frassini - ema.frassini@hotmail.com -[Emanuele Frassini](https://www.linkedin.com/in/emanuele-frassini-1a7a37208)
