@@ -15,7 +15,7 @@ EPOCHS=1000
 #BATCH_SIZE=8
 
 #Create special folder run
-base_folder = r'C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
+base_folder = os.path.join(os.path.dirname(__file__), 'runs')
 
 # Get the current date and time
 current_datetime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -25,7 +25,7 @@ folder_path_inforun = os.path.join(base_folder, f'runs_PAPER_{current_datetime}'
 os.makedirs(folder_path_inforun, exist_ok=True)
 ##Data
 #Load data
-def load_data(file_path= r'C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\time_binary_regression\data\dataset.npz'):
+def load_data(file_path):
 
     
     current_dir = os.getcwd()

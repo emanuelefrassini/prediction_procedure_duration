@@ -30,10 +30,7 @@ SMAPE_MIN=18.5
 MAE_MIN=7.5
 #FOLDER CREATION
 
-if pc=='PC_mine' or pc=='PC_office':
-    base_folder = r'C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
-elif pc=='PC_tudelft' or pc=='PC_rdg':
-    base_folder = r'C:\Users\efrassini\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
+base_folder = os.path.join(os.path.dirname(__file__), 'runs')
 
 # Get the current date and time
 current_datetime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")

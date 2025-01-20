@@ -31,10 +31,7 @@ SMAPE_MIN=17
 MAE_MIN=7
 #FOLDER CREATION
 
-if pc=='PC_mine' or pc=='PC_office':
-    base_folder = r'C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
-elif pc=='PC_tudelft' or pc=='PC_rdg':
-    base_folder = r'C:\Users\efrassini\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
+base_folder = os.path.join(os.path.dirname(__file__), 'runs')
 
 # Get the current date and time
 current_datetime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -723,7 +720,7 @@ import os
 import re
 
 # Define the folder path where the text files are located
-folder_path = r"C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\runs_20240407-112330_time_binary_regression\test_predictions"
+folder_path = os.path.join(folder_path_inforun , 'test_predictions')
 
 # Initialize lists to store values
 y_test_list = []

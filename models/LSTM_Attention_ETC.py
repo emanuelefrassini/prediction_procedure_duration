@@ -9,10 +9,9 @@ from sklearn.model_selection import KFold
 import time
 import os
 import datetime
-#from utils.attention_layer import Attention 
+
 
 #PARAMETERS
-pc='PC_office'
 endpoint='time_binary_regression'
 #MODEL PARAMETERS
 
@@ -27,10 +26,7 @@ DROPOUT_RATE=0.1
 LEARNING_RATE=0.001
 #FOLDER CREATION
 
-if pc=='PC_mine' or pc=='PC_office':
-    base_folder = r'C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
-elif pc=='PC_tudelft' or pc=='PC_rdg':
-    base_folder = r'C:\Users\efrassini\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\\'
+base_folder = os.path.join(os.path.dirname(__file__), 'runs')
 
 # Get the current date and time
 current_datetime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -74,11 +70,6 @@ Y_path = os.path.join(current_dir, "..\data\Y.csv")
 
 X = np.loadtxt(X_path,delimiter=",").reshape(222, 7573, 1)
 Y = np.loadtxt(Y_path,delimiter=",").reshape(222, 7573, 1)
-
-#loaded_Y = np.loadtxt("data\Y.csv", delimiter=",").reshape(222, 7573, 1)
-# Verify if they are identical
- 
-
 
 
 
@@ -708,7 +699,8 @@ import os
 import re
 
 # Define the folder path where the text files are located
-folder_path = r"C:\Users\emanuelefrassi\OneDrive - Delft University of Technology\Work\Codes\MTSC\runs\runs_20240407-112330_time_binary_regression\test_predictions"
+folder_path = os.path.join(folder_path_inforun , 'test_predictions')
+
 
 # Initialize lists to store values
 y_test_list = []
