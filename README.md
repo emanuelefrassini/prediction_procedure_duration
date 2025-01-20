@@ -30,6 +30,7 @@ To install the required dependencies, run this command:
 The dataset used in this study is stored in a folder named `data`, located at the root of the repository. It consists of two CSV files:
  * `X.csv`: Contains the input features, namely clinical phases derived from video analysis.
  * `Y.csv`: Contains the target labels, representing the time to the end of the procedure, in seconds.
+ 
 Both input and output are recorded with the frequency of 1 datapoint per second.
 Ensure the dataset files are placed in the `data` folder before running the code.
 
