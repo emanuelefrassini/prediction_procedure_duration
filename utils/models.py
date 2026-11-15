@@ -2,7 +2,7 @@ import keras
 import numpy as np
 from keras.layers import Layer,LSTM,Bidirectional, Dropout, Dense,Input, multiply, concatenate, Activation, Masking, Reshape,Conv1D, BatchNormalization, GlobalAveragePooling1D
 from keras.models import Model
-from attention import Attention
+from utils.attention_layer import Attention
 from keras import layers
 import tensorflow.keras.backend as K
 ######################SMAPE##################################

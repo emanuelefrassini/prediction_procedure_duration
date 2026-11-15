@@ -25,15 +25,15 @@ folder_path_inforun = os.path.join(base_folder, f'runs_PAPER_{current_datetime}'
 os.makedirs(folder_path_inforun, exist_ok=True)
 ##Data
 #Load data
-def load_data(file_path):
+def load_data(file_path=None):
 
     
     current_dir = os.getcwd()
 
 
     # Construct the path to the dataset relative to the script
-    X_path = os.path.join(current_dir, "..\data\X.csv")
-    Y_path = os.path.join(current_dir, "..\data\Y.csv")
+    X_path = os.path.join(os.environ.get("ETC_DATA_DIR", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")), "X.csv")
+    Y_path = os.path.join(os.environ.get("ETC_DATA_DIR", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")), "Y.csv")
 
     X = np.loadtxt(X_path,delimiter=",").reshape(222, 7573, 1)
     Y = np.loadtxt(Y_path,delimiter=",").reshape(222, 7573, 1)

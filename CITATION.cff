@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the peer-reviewed publication."
+title: "Phase-based prediction of coronary angiography procedure duration: research code"
+authors:
+  - family-names: Frassini
+    given-names: Emanuele
+  - family-names: Vijfvinkel
+    given-names: Teddy S.
+  - family-names: Butler
+    given-names: Rick M.
+  - family-names: van der Elst
+    given-names: Maarten
+  - family-names: Hendriks
+    given-names: Benno H. W.
+  - family-names: van den Dobbelsteen
+    given-names: John J.
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Frassini
+      given-names: Emanuele
+    - family-names: Vijfvinkel
+      given-names: Teddy S.
+    - family-names: Butler
+      given-names: Rick M.
+    - family-names: van der Elst
+      given-names: Maarten
+    - family-names: Hendriks
+      given-names: Benno H. W.
+    - family-names: van den Dobbelsteen
+      given-names: John J.
+  title: "Deep learning methods for clinical workflow phase-based prediction of procedure duration: a benchmark study"
+  journal: "Computer Assisted Surgery"
+  year: 2025
+  volume: '30'
+  issue: '1'
+  doi: 10.1080/24699322.2025.2466426
+  url: https://doi.org/10.1080/24699322.2025.2466426
