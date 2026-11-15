@@ -1,0 +1,2 @@
+# Lightweight, modern utilities only; NOT a pinned environment for TensorFlow 2.10.
+numpy>=1.24,<3

@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+# Generated figures and diagnostic outputs should be inspected before sharing
+models/runs/
+models/**/runs/
+runs/
+outputs/
+logs/
+*.h5
+*.hdf5
+*.keras
+*.ckpt
+*.ckpt.*
+*.bak
+# Future procedure datasets should not be accidentally committed.
+# Important: gitignore does NOT remove data/X.csv and data/Y.csv already tracked in Git.
+data/*.csv
+data/*.npz
+data/*.pkl
