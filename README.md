@@ -6,6 +6,30 @@
 
 > **Scope and status.** This repository contains historical TensorFlow/Keras research scripts and numerical phase/target CSVs, plus lightweight validation utilities. The published results below are **reported from the paper, not a reproduction** by the added tests. This is research software, **not** a validated clinical decision-support system.
 
+## Reproducible causal benchmark (PyTorch)
+
+A standalone [modern PyTorch implementation](modern_etc/) is available for training and evaluating remaining-time prediction models without access to clinical data.
+
+The implementation includes:
+
+- LSTM, LSTM-Attention, LSTM-FCN, InceptionTime-inspired and Transformer architectures.
+- Causal predictions without access to future workflow phases.
+- Independent procedure-level training, validation and test splits.
+- A statistical baseline and a fixed two-model ensemble.
+- Reproducible synthetic experiments and automated tests.
+
+### Quick start
+
+```bash
+python -m pip install -r modern_etc/requirements.txt
+python -m pytest modern_etc/tests -v
+python -m modern_etc --cases 90 --folds 3 --epochs 20 --seed 42 --width 32 --interval 30 --output /tmp/etc_synthetic.json
+
+
+See the benchmark documentation and numerical results.
+
+This independent implementation complements the historical TensorFlow/Keras research code. Its synthetic results do not reproduce or replace the published clinical results.
+
 ## Scientific motivation
 
 For a procedure in a cardiac catheterization laboratory, estimating the expected time to completion can help coordinate downstream scheduling. This benchmark evaluates how well a one-dimensional sequence of **manually annotated clinical workflow phases** predicts the remaining time until the end of a diagnostic coronary angiography (CAG) procedure. The models are not trained on raw video pixels; annotations were derived from video review.
