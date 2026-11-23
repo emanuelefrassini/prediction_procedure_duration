@@ -17,7 +17,7 @@ The main experiment is `models/PAPER_ETC.py`. It uses the five architecture defi
 - InceptionTime
 - Ensemble: equal-weight average of InceptionTime and LSTM-FCN
 
-The experiment is configured for **100 trials**, **three cross-validation folds per trial**, and sampling intervals of **5, 10, 30, 60 and 120 seconds**. The outer folds separate whole procedures. Each training fold is partitioned into training and validation procedures; validation drives early stopping and learning-rate adjustments, and the outer test fold is used only for final evaluation.
+The experiment is configured for **100 trials**, **three cross-validation folds per trial**, and sampling intervals of **5, 10, 30, 60 and 120 seconds**. The outer folds separate whole procedures. Each training fold is partitioned into training and validation procedures. Validation drives early stopping and learning rate adjustments, and the outer test fold is used only for final evaluation.
 
 Training uses Adam and a padding-aware SMAPE objective with the paper's **0–100%** normalization. The maximum number of epochs is 1,000; early stopping has a patience of 100 epochs and the learning rate is halved after 50 epochs without sufficient validation improvement. Training batches are not shuffled. Model architecture definitions and hyperparameters in `utils/models.py` and `models/PAPER_ETC.py` remain the ones used in the repository's research scripts.
 
@@ -40,7 +40,7 @@ The full experiment is computationally expensive. See [reproducibility instructi
 
 ## Results
 
-The following values are quoted from Table 2 of the publication at a sampling interval of **60 seconds**. They are **not** new measurements from the current code checkout.
+The following values are quoted from Table 2 of the publication at a sampling interval of **60 seconds**. 
 
 | Architecture | MAE (min) | SMAPE (%) |
 |---|---:|---:|
@@ -51,7 +51,7 @@ The following values are quoted from Table 2 of the publication at a sampling in
 | LSTM-Attention | 17.33 ± 3.54 | 75.6 ± 21.1 |
 | Ensemble | 1.32 ± 0.76 | 7.2 ± 1.9 |
 
-The reported single-center results should not be interpreted as external validation or performance guarantees. The architecture definitions retain the original time-series convolution and attention choices; strictly online prefix-causal behavior is not claimed.
+The reported results should not be interpreted as external validation or performance guarantees. The architecture definitions retain the original time-series convolution and attention choices.
 
 ## Installation and checks
 
