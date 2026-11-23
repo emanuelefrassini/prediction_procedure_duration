@@ -1,12 +1,13 @@
-# Python
+# Python bytecode, environments and test caches
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
-.venv-tf210/
+.venv-*/
 venv/
 .env
-# Generated figures and diagnostic outputs should be inspected before sharing
+
+# Training and analysis outputs (inspect before committing anything derived)
 models/runs/
 models/**/runs/
 runs/
@@ -18,8 +19,10 @@ logs/
 *.ckpt
 *.ckpt.*
 *.bak
-# Future procedure datasets should not be accidentally committed.
-# Important: gitignore does NOT remove data/X.csv and data/Y.csv already tracked in Git.
-data/*.csv
-data/*.npz
-data/*.pkl
+
+# Published anonymized data remain versioned; ignore other local datasets
+# by default. These rules do not remove existing tracked files.
+data/*
+!data/README.md
+!data/X.csv
+!data/Y.csv
