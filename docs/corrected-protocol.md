@@ -23,6 +23,7 @@ No clinical records or model weights are bundled with this extension.
 | Test metrics | Mixed padding/inverse scaling handling | Real units (seconds), padding excluded; macro per-procedure |
 | Dataset access | Module import launches expensive training | Explicit `--execute` flag; default dry run |
 | Repeated splits | Unseeded `KFold` | Deterministic seed recorded per trial |
+| Training batch order | Keras `fit(..., shuffle=False)`; paper states batches were not shuffled | No per-epoch permutation of training procedures (paper-aligned) |
 
 The historical factory networks are reused **without claiming architectural
 identity with the trained models in the publication**. The existing
@@ -85,6 +86,9 @@ folds. A fixed fraction (default 20%) of the *remaining* procedures is used
 for early stopping and LR scheduling. The new runner uses an explicit
 `tf.GradientTape` loop rather than relying on automatic Keras output-mask
 weighting; padded targets are excluded in the differentiable objective.
+The corrected loop preserves procedure order within each training fold across
+all epochs. This follows the paper's non-shuffled batching description;
+there is no claim that its original run order or random seeds are recovered.
 The test cases are evaluated only after
 each model is fitted. Each trial uses a recorded seed; each fitted model has
 its own deterministic seed. Different trials produce different outer folds.
@@ -111,7 +115,7 @@ selecting the component models from performance on test folds.
 ## Remaining limitations
 
 - The legacy architecture factories may have version-specific Keras behaviour;
-  **real clinical training has not been executed as part of this patch**.
+  **real clinical training is not performed as part of this documentation-only update; the user has already completed limited one-epoch smoke runs**.
 - This protocol makes an explicit interpretation of the paper's SMAPE loss and
   the training/validation split. Neither is proven to be the exact historical
   configuration used to create the published table.

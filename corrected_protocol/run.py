@@ -69,6 +69,19 @@ BATCH_SIZES = {'lstm': 8, 'lstm_attention': 8, 'lstm_fcn': 4,
                'transformer': 2, 'inceptiontime': 2}
 
 
+def unshuffled_procedure_batches(n_procedures: int, batch_size: int):
+    """Yield consecutive case indices without per-epoch shuffling.
+
+    The 2025 paper specifies non-shuffled batches. The upstream fold plan
+    determines which procedures are in training; their order is left intact.
+    This changes neither outer fold assignment nor validation/test isolation.
+    """
+    if n_procedures < 1 or batch_size < 1:
+        raise ValueError('n_procedures and batch_size must be positive')
+    for start in range(0, n_procedures, batch_size):
+        yield np.arange(start, min(start + batch_size, n_procedures))
+
+
 def fit_one(name, x_train, y_train, x_val, y_val, x_test, *, epochs, seed):
     """Explicit masked-SMAPE training with independent validation-only selection.
 
@@ -83,7 +96,6 @@ def fit_one(name, x_train, y_train, x_val, y_val, x_test, *, epochs, seed):
     tf.keras.utils.set_random_seed(seed)
     model = build_architecture(name, x_train.shape[1], epochs)
     optimizer = model.optimizer  # constructed by the archived factory
-    rng = np.random.default_rng(seed)
     early_patience = max(2, epochs // 10)
     lr_patience = max(2, epochs // 20)
     best_val = float('inf')
@@ -93,10 +105,9 @@ def fit_one(name, x_train, y_train, x_val, y_val, x_test, *, epochs, seed):
     epoch_count = 0
 
     for epoch in range(epochs):
-        # Training sees only the outer training pool minus inner validation.
-        order = rng.permutation(len(x_train))
-        for i in range(0, len(order), BATCH_SIZES[name]):
-            idx = order[i:i + BATCH_SIZES[name]]
+        # The paper states that batches were constructed without shuffling.
+        # Each item is one whole procedure; no outer test case is used here.
+        for idx in unshuffled_procedure_batches(len(x_train), BATCH_SIZES[name]):
             batch_x = tf.convert_to_tensor(x_train[idx], dtype=tf.float32)
             batch_y = tf.convert_to_tensor(y_train[idx], dtype=tf.float32)
             with tf.GradientTape() as tape:

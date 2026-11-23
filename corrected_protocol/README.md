@@ -1,12 +1,15 @@
 # Corrected ETC evaluation protocol
 
-This new runner uses the existing `utils/models.py` architecture factories while
+This new runner uses the **full archived TensorFlow/Keras architectures**
+from `utils/models.py` (not the smaller, independent `modern_etc` models) while
 correcting training/validation/test isolation, masked-SMAPE training, the trial schedule and
-ensemble definition. It does **not** establish that the 2025 publication's
+ensemble definition, and unshuffled procedure batches. It does **not** establish that the 2025 publication's
 reported results were generated using these exact settings. The original
 `models/PAPER_ETC.py` is retained for historical provenance.
 
 Full methodology and instructions: [corrected protocol guide](../docs/corrected-protocol.md).
+An explicit response to the original repository criticisms is available in the
+[paper-alignment checklist](../docs/paper-alignment-checklist.md).
 
 Preview without clinical data or TensorFlow:
 
