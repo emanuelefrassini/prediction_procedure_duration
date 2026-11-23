@@ -1,3 +1,7 @@
+# ARCHIVED EXPERIMENT: This file is preserved for research provenance.
+# It uses the test fold for Keras validation, nine trials, five-model
+# ensembling and MAE training. Do not use for corrected evaluation.
+# See corrected_protocol/ and docs/corrected-protocol.md.
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import save_model

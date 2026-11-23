@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+.venv-tf210/
 venv/
 .env
 # Generated figures and diagnostic outputs should be inspected before sharing

@@ -59,3 +59,16 @@ which ranges from 0 to 100%, not the sometimes-used 0 to 200% version. In the ad
 ## Responsible sharing
 
 The paper's open-access **CC BY 4.0** publication license does not automatically grant a software or clinical-data redistribution license. No code license is asserted in this update. Never add recordings, patient identifiers, weights, experiment output or intermediate clinical feature arrays to a public repo without approval. `.gitignore` only prevents **new untracked additions**; it cannot remove or de-publish the `data/X.csv` and `data/Y.csv` files that are already in Git history.
+
+
+## Corrected protocol added after the historical audit
+
+See [`docs/corrected-protocol.md`](corrected-protocol.md) and run
+`python -m corrected_protocol` to preview the seeded 100 × 3-fold plan
+without importing TensorFlow or reading clinical data. Execute only in a
+validated Python 3.10 environment, using a limited smoke run first. The
+archived training code is retained unchanged apart from a warning comment.
+The corrected protocol has **not** been established to be the exact model
+configuration used to produce the published results. The maintainer states
+that the existing anonymized CSVs were intended for public release; this
+patch neither changes them nor rewrites Git history.

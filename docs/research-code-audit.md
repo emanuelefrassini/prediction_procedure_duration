@@ -23,3 +23,14 @@ The purpose of this audit is **traceability**, not criticism or a claim of inval
 - Syntax checks of added files and (when present in the checkout) the principal legacy script.
 
 **What remains unverified:** correctness of all historical TensorFlow training scripts; dataset release permissions; exact 100-trial result reproduction; the clinical error table; training/inference time results; compatibility of legacy custom attention layers with newer Keras. New experiment results should not be labeled 'paper reproduced' until the same preprocessing, selection, architecture, ensemble, splits, loss, seeds and dataset are verified.
+
+
+## Corrected rerun protocol (new addition)
+
+A separate implementation under [`corrected_protocol/`](../corrected_protocol/)
+provides disjoint nested procedure-level splits, a seeded 100-trial default,
+masked SMAPE objective, two-model ensemble and test-only final scoring.
+See [`corrected-protocol.md`](corrected-protocol.md) for differences,
+remaining architecture limitations, and how to run the data-free tests.
+**This does not change or retroactively validate** historical
+`models/PAPER_ETC.py` or the results published in 2025.

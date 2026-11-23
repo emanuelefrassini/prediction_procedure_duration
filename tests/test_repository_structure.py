@@ -30,7 +30,8 @@ class RepositoryStructureTests(unittest.TestCase):
 
     def test_caution_for_existing_data(self):
         readme = (ROOT / 'README.md').read_text(encoding='utf-8')
-        self.assertIn('already tracked', readme)
+        self.assertIn('publicly tracked', readme)
+        self.assertIn('anonymized', readme)
         gitignore = (ROOT / '.gitignore').read_text(encoding='utf-8')
         self.assertIn('data/*.csv', gitignore)
 

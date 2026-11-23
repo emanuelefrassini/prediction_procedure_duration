@@ -24,11 +24,32 @@ The implementation includes:
 python -m pip install -r modern_etc/requirements.txt
 python -m pytest modern_etc/tests -v
 python -m modern_etc --cases 90 --folds 3 --epochs 20 --seed 42 --width 32 --interval 30 --output /tmp/etc_synthetic.json
+```
 
-
-See the benchmark documentation and numerical results.
+See the [benchmark documentation](modern_etc/README.md) and [numerical results](modern_etc/results/synthetic_example.json).
 
 This independent implementation complements the historical TensorFlow/Keras research code. Its synthetic results do not reproduce or replace the published clinical results.
+
+## Corrected clinical evaluation protocol (separate rerun)
+
+A new [corrected evaluation runner](corrected_protocol/) addresses historical
+split leakage, trial counts, ensemble composition, padding-aware SMAPE loss,
+and per-model early-stopping state. It uses the **archived architecture factories**
+but keeps training, validation and test procedures disjoint.
+
+The default run plan is **100 trials × 3 folds × 5 sampling intervals × 5
+architectures**. The command below is a data-free dry run:
+
+```bash
+python -m corrected_protocol
+```
+
+For a limited real-data training check (requires a separate Python 3.10 /
+TensorFlow 2.10 environment), see the [protocol and environment guide](docs/corrected-protocol.md).
+The historical `models/PAPER_ETC.py` remains in the repository for provenance;
+it is **not** the recommended evaluation runner. The corrected runner has not
+been used to reproduce the clinical table in the published article. The
+clinical data files are unchanged.
 
 ## Scientific motivation
 
@@ -62,7 +83,7 @@ The following are the **published Table 2 values** at one input sample every **6
 | `models/` | Historical Keras/TensorFlow model experiments, including `PAPER_ETC.py` and model-specific runs |
 | `utils/` | Original shared preprocessing, attention and training code |
 | `tools/` | Original analysis, plotting and ensemble scripts |
-| `data/X.csv`, `data/Y.csv` | Existing tracked procedure-derived phase/target data; **review sharing authorization** |
+| `data/X.csv`, `data/Y.csv` | Anonymized procedure-derived phase/target data; original release retained |
 | `phase_etc/` | Added NumPy-only metrics and deterministic procedure-level train/validation/test split helpers |
 | `scripts/smoke_etc.py` | Data-free synthetic validation |
 | `scripts/inspect_dataset.py` | Optional local CSV shape/padding inspection (no raw rows printed) |
@@ -111,7 +132,7 @@ To opt in, review `docs/reproducibility.md` before running `--apply`. **Do not l
 
 ## Data governance and limitations
 
-The `data/X.csv` and `data/Y.csv` files are **already tracked in the public Git repository**. Please verify that redistribution of these procedure-derived data is authorized. The new `.gitignore` prevents accidental *future* additions of similar files; it does **not** remove files or their earlier versions from Git history. No clinical data are included in the synthetic examples or test output. The paper is open-access under CC BY 4.0; this does **not** automatically license the repository's software or data.
+The `data/X.csv` and `data/Y.csv` files remain **publicly tracked**. The maintainer confirms that these procedure-derived data are anonymized and intended for public distribution; this protocol update does not modify them. The `.gitignore` prevents accidental *future* additions of similar files; it does **not** remove files or their earlier versions from Git history. No clinical data are included in the synthetic examples or test output. The paper is open-access under CC BY 4.0; this does **not** automatically license the repository's software or data.
 
 This is a single-center, retrospective phase-based benchmark with manually annotated workflows. External clinical validation, real-time automated phase recognition, and robustness to partial procedures are outside the scope of the released checks.
 
