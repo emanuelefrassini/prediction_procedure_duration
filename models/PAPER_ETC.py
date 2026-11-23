@@ -1,21 +1,24 @@
-# ARCHIVED EXPERIMENT: This file is preserved for research provenance.
-# It uses the test fold for Keras validation, nine trials, five-model
-# ensembling and MAE training. Do not use for corrected evaluation.
-# See corrected_protocol/ and docs/corrected-protocol.md.
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from keras.models import save_model
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import KFold
+import tensorflow as tf
+from utils.paper_training import (
+    split_train_validation, prepare_fold_arrays,
+    TargetScale, smape, masked_smape_tf, train_model,
+)
 import time
 import os
 import datetime
 from contextlib import redirect_stdout
 
 ##PARAMETERS
-reduce_dim=[5,10,30,60,120]
+reduce_dim=[int(v) for v in os.environ.get("ETC_INTERVALS", "5,10,30,60,120").split(",")]
 NUM_FOLDS=3
-EPOCHS=1000
+EPOCHS=int(os.environ.get("ETC_EPOCHS", "1000"))
 #BATCH_SIZE=8
 
 #Create special folder run
@@ -45,7 +48,7 @@ def load_data(file_path=None):
 Xload,Yload=load_data()
 #Repeat n times all this:
     #Set reduce dimension, per reduce_dim: 
-for trial in range(91,100):
+for trial in range(1, int(os.environ.get("ETC_TRIALS", "100")) + 1):
     folder_path_inforun2 = os.path.join(folder_path_inforun, f'trial_{trial}')
     # Info run save path
     os.makedirs(folder_path_inforun2, exist_ok=True)
@@ -64,18 +67,21 @@ for trial in range(91,100):
         os.makedirs(folder_path_perdim, exist_ok=True)
             
         # Experiment set up
-        kfold = KFold(n_splits=NUM_FOLDS, shuffle=True)  
+        kfold = KFold(n_splits=NUM_FOLDS, shuffle=True, random_state=2026+trial)
         
         fold = 0
         
         for train, test in kfold.split(X):
-            from utils.models import model_INCEPTIONTIME, model_LSTM, model_LSTM_Attention, model_LSTM_FCN, model_transformer,smape
+            from utils.models import model_INCEPTIONTIME, model_LSTM, model_LSTM_Attention, model_LSTM_FCN, model_transformer
             start_fold = time.time()
             
             folder_path_perfold = os.path.join(folder_path_perdim, f'fold_{fold}')
             # Info run save path
             os.makedirs(folder_path_perfold, exist_ok=True)
-            indices = {"train": train, "test": test}
+            train, validation = split_train_validation(
+                train, fraction=0.2, seed=2026 + 1000*trial + fold
+            )
+            indices = {"train": train, "validation": validation, "test": test}
       
       # Save indices into a single file
             file_path = os.path.join(folder_path_perfold, "Indices.npy")
@@ -83,25 +89,18 @@ for trial in range(91,100):
             
             fold += 1
             
-            X_train = X[train, :, :]
-            X_test = X[test, :, :]
-        
-            scaler_x = MinMaxScaler()
-            X_train = scaler_x.fit_transform(X_train.reshape(-1, X_train.shape[-1])).reshape(X_train.shape)
-            X_test = scaler_x.transform(X_test.reshape(-1, X_test.shape[-1])).reshape(X_test.shape)
-         
-            y_train = np.float32(Y[train])
-            y_test = np.float32(Y[test])
-        
-            scaler_y = MinMaxScaler()
-            y_train = scaler_y.fit_transform(y_train.reshape(-1, y_train.shape[-1])).reshape(y_train.shape)
-            y_test = scaler_y.transform(y_test.reshape(-1, y_test.shape[-1])).reshape(y_test.shape)
+            X_train, X_val, X_test, y_train, y_val, y_test = prepare_fold_arrays(
+                X, Y, train, validation, test
+            )
+            scaler_y = TargetScale()
+
             
             
          
             #Process data (function)
             ##Training
             #3fold split, per split train:
+            tf.keras.utils.set_random_seed(2026 + 1000*trial + fold)
             model_LSTM,model_callbacks=model_LSTM(UNITS=128,DROPOUT_RATE=0.1,LEARNING_RATE=0.001)
             model_LSTM_Attention,model_callbacks=model_LSTM_Attention(UNITS=128,DROPOUT_RATE=0.1,LEARNING_RATE=0.001)
             model_LSTM_FCN,model_callbacks=model_LSTM_FCN(X_1,X_2,UNITS=256,DROPOUT_RATE=0.1,LEARNING_RATE=0.001)
@@ -109,11 +108,16 @@ for trial in range(91,100):
             model_INCEPTIONTIME,model_callbacks=model_INCEPTIONTIME(X_1,X_2,LEARNING_RATE=0.0001,EPOCHS=EPOCHS,BATCH_SIZE=2,stride=1, activation='linear',
                              nb_filters=30, use_residual=True, depth=8, kernel_size=41,use_bottleneck=False,
                              bottleneck_size = 32)
+            for paper_model in (model_LSTM, model_LSTM_Attention, model_LSTM_FCN,
+                                model_transformer, model_INCEPTIONTIME):
+                paper_model.compile(optimizer=paper_model.optimizer, loss=masked_smape_tf)
             
             #LSTM
             startLSTM=time.time()
-            history_LSTM = model_LSTM.fit(X_train, y_train, batch_size=8, epochs=EPOCHS, verbose=1, shuffle=False,
-                                callbacks=model_callbacks, validation_data=(X_test, y_test))
+            training_LSTM = train_model(
+                model_LSTM, X_train, y_train, X_val, y_val,
+                epochs=EPOCHS, batch_size=8
+            )
             trainLSTM=time.time()-startLSTM
             startLSTM=time.time()
             y_test_predict = model_LSTM.predict(X_test)
@@ -125,7 +129,7 @@ for trial in range(91,100):
             os.makedirs(model_path, exist_ok=True)
             
             #SAVE MODEL
-            save_model(model_LSTM, os.path.join(model_path, "model"))
+            save_model(model_LSTM, os.path.join(model_path, "model"), include_optimizer=False)
     
             #SAVE MODEL SUMMARY
             summary_file_path = os.path.join(model_path,"model_summary.txt")
@@ -182,11 +186,17 @@ for trial in range(91,100):
             
             #LSTM_FCN
             startLSTM_FCN=time.time()
-            history_LSTM_FCN = model_LSTM_FCN.fit(X_train, y_train, batch_size=4, epochs=EPOCHS, verbose=1, shuffle=False,
-                                callbacks=model_callbacks, validation_data=(X_test, y_test))
+            # LSTM-FCN uses zero-valued input padding.
+            X_train_fcn = np.where(X_train == -1, 0.0, X_train)
+            X_val_fcn = np.where(X_val == -1, 0.0, X_val)
+            X_test_fcn = np.where(X_test == -1, 0.0, X_test)
+            training_LSTM_FCN = train_model(
+                model_LSTM_FCN, X_train_fcn, y_train, X_val_fcn, y_val,
+                epochs=EPOCHS, batch_size=4
+            )
             trainLSTM_FCN=time.time()-startLSTM_FCN
             startLSTM_FCN=time.time()
-            y_test_predict = model_LSTM_FCN.predict(X_test)
+            y_test_predict = model_LSTM_FCN.predict(X_test_fcn)
             testLSTM_FCN=time.time()-startLSTM_FCN
             y_test_predict_LSTM_FCN = scaler_y.inverse_transform(y_test_predict.reshape(-1, y_test_predict.shape[-1])).reshape(y_test_predict.shape) 
             y_test_rescaled = scaler_y.inverse_transform(y_test.reshape(-1, y_test.shape[-1])).reshape(y_test.shape)
@@ -195,7 +205,7 @@ for trial in range(91,100):
             os.makedirs(model_path, exist_ok=True)
             
             #SAVE MODEL
-            save_model(model_LSTM_FCN, os.path.join(model_path, "model"))
+            save_model(model_LSTM_FCN, os.path.join(model_path, "model"), include_optimizer=False)
     
             #SAVE MODEL SUMMARY
             summary_file_path = os.path.join(model_path,"model_summary.txt")
@@ -251,8 +261,10 @@ for trial in range(91,100):
             
             #LSTM_Attention_ATTENTION
             startLSTM_Attention=time.time()
-            history_LSTM_Attention = model_LSTM_Attention.fit(X_train, y_train, batch_size=8, epochs=EPOCHS, verbose=1, shuffle=False,
-                                callbacks=model_callbacks, validation_data=(X_test, y_test))
+            training_LSTM_Attention = train_model(
+                model_LSTM_Attention, X_train, y_train, X_val, y_val,
+                epochs=EPOCHS, batch_size=8
+            )
             trainLSTM_Attention=time.time()-startLSTM_Attention
             startLSTM_Attention=time.time()
             y_test_predict = model_LSTM_Attention.predict(X_test)
@@ -264,7 +276,7 @@ for trial in range(91,100):
             os.makedirs(model_path, exist_ok=True)
             
             #SAVE MODEL
-            save_model(model_LSTM_Attention, os.path.join(model_path, "model"))
+            save_model(model_LSTM_Attention, os.path.join(model_path, "model"), include_optimizer=False)
     
             #SAVE MODEL SUMMARY
             summary_file_path = os.path.join(model_path,"model_summary.txt")
@@ -320,8 +332,10 @@ for trial in range(91,100):
             
             #INCEPTIONTIME
             startINCEPTIONTIME=time.time()
-            history_INCEPTIONTIME = model_INCEPTIONTIME.fit(X_train, y_train, batch_size=2, epochs=EPOCHS, verbose=1, shuffle=False,
-                                callbacks=model_callbacks, validation_data=(X_test, y_test))
+            training_INCEPTIONTIME = train_model(
+                model_INCEPTIONTIME, X_train, y_train, X_val, y_val,
+                epochs=EPOCHS, batch_size=2
+            )
             trainINCEPTIONTIME=time.time()-startINCEPTIONTIME
             startINCEPTIONTIME=time.time()
             y_test_predict = model_INCEPTIONTIME.predict(X_test)
@@ -333,7 +347,7 @@ for trial in range(91,100):
             os.makedirs(model_path, exist_ok=True)
             
             #SAVE MODEL
-            save_model(model_INCEPTIONTIME, os.path.join(model_path, "model"))
+            save_model(model_INCEPTIONTIME, os.path.join(model_path, "model"), include_optimizer=False)
     
             #SAVE MODEL SUMMARY
             summary_file_path = os.path.join(model_path,"model_summary.txt")
@@ -390,8 +404,10 @@ for trial in range(91,100):
             
             #transformer
             starttransformer=time.time()
-            history_transformer = model_transformer.fit(X_train, y_train, batch_size=2, epochs=EPOCHS, verbose=1, shuffle=False,
-                                callbacks=model_callbacks, validation_data=(X_test, y_test))
+            training_transformer = train_model(
+                model_transformer, X_train, y_train, X_val, y_val,
+                epochs=EPOCHS, batch_size=2
+            )
             traintransformer=time.time()-starttransformer
             starttransformer=time.time()
             y_test_predict = model_transformer.predict(X_test)
@@ -403,7 +419,7 @@ for trial in range(91,100):
             os.makedirs(model_path, exist_ok=True)
             
             #SAVE MODEL
-            save_model(model_transformer, os.path.join(model_path, "model"))
+            save_model(model_transformer, os.path.join(model_path, "model"), include_optimizer=False)
     
             #SAVE MODEL SUMMARY
             summary_file_path = os.path.join(model_path,"model_summary.txt")
@@ -464,7 +480,7 @@ for trial in range(91,100):
             os.makedirs(model_path, exist_ok=True)
             
             
-            y_test_predict_ensemble=0.2*y_test_predict_INCEPTIONTIME+0.2*y_test_predict_LSTM+0.2*y_test_predict_LSTM_Attention+0.2*y_test_predict_LSTM_FCN+0.2*y_test_predict_transformer
+            y_test_predict_ensemble = 0.5 * (y_test_predict_INCEPTIONTIME + y_test_predict_LSTM_FCN)
             #SAVE MODEL
       #      save_model(model_transformer, os.path.join(model_path, "model"))
     
@@ -482,8 +498,8 @@ for trial in range(91,100):
             #SAVE TEST PREDICTIONS
             pred_path = os.path.join(model_path, "test_predictions")
             os.makedirs(pred_path, exist_ok=True)
-            testMAE_transformer=[]
-            testSMAPE_transformer=[]
+            testMAE_ensemble=[]
+            testSMAPE_ensemble=[]
             
             for i in range(y_test.shape[0]):
                 file_path_temp = os.path.join(pred_path, f"test_predictions_{i}.txt")
@@ -501,22 +517,22 @@ for trial in range(91,100):
                 else:
                     indices=indices[0]
                
-                testMAE_transformer.append(mean_absolute_error(y_test_rescaled[i,0:indices], y_test_predict_ensemble[i,0:indices]))
-                testSMAPE_transformer.append(smape(y_test_rescaled[i,0:indices], y_test_predict_ensemble[i,0:indices]))
+                testMAE_ensemble.append(mean_absolute_error(y_test_rescaled[i,0:indices], y_test_predict_ensemble[i,0:indices]))
+                testSMAPE_ensemble.append(smape(y_test_rescaled[i,0:indices], y_test_predict_ensemble[i,0:indices]))
             
             #SAVE TEST METRICS
             mae_path = os.path.join(model_path, 'mae_per_procedure.txt')
             with open(mae_path, 'w') as file:
-                 file.write("Average among all the procedures in this fold:  {} [min]\n".format(np.mean(testMAE_transformer)/60))
+                 file.write("Average among all the procedures in this fold:  {} [min]\n".format(np.mean(testMAE_ensemble)/60))
     
-                 for index, item in enumerate(testMAE_transformer):
+                 for index, item in enumerate(testMAE_ensemble):
                      file.write("Procedure number {} - mae: {} [min]\n".format(index,
                                 item/60))
             smape_path = os.path.join(model_path, 'SMAPE_per_procedure.txt')
             with open(smape_path, 'w') as file:
-                 file.write("Average among the procedures in this fold:  {} % %\n".format(np.mean(testSMAPE_transformer)))
+                 file.write("Average among the procedures in this fold:  {} % %\n".format(np.mean(testSMAPE_ensemble)))
     
-                 for index, item in enumerate(testSMAPE_transformer):
+                 for index, item in enumerate(testSMAPE_ensemble):
                      file.write("Procedure number {} - SMAPE: {} % %\n".format(index,
                                   item))    
             

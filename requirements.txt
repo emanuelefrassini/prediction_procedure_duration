@@ -1,3 +1,2 @@
-# Reconstructed candidate TF 2.10 environment; Python 3.10 only.
-# Consult docs/corrected-protocol.md before clinical training.
+# Python 3.10, TensorFlow 2.10 experiment environment.
 -r requirements-legacy-py310.txt

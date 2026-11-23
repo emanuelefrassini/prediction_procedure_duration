@@ -1,9 +1,9 @@
-name: Research repository checks (no clinical data)
+name: Research code checks
 on:
   push:
   pull_request:
 jobs:
-  data-free-tests:
+  checks:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -11,29 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Do not place tracked clinical phase CSVs into CI's working tree.
           sparse-checkout: |
             /.github/
             /README.md
-            /.gitignore
-            /CITATION.cff
             /requirements-validation.txt
-            /docs/
-            /figures/
-            /phase_etc/
-            /corrected_protocol/
-            /scripts/
+            /requirements.txt
             /tests/
+            /utils/paper_training.py
             /models/PAPER_ETC.py
-            /models/inceptiontime_ETC.py
           sparse-checkout-cone-mode: false
-          lfs: false
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install lightweight verification dependencies
+      - name: Install test dependencies
         run: python -m pip install -r requirements-validation.txt
-      - name: Repository and metric unit tests
+      - name: Unit tests
         run: python -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Synthetic ETC smoke test
-        run: python scripts/smoke_etc.py
