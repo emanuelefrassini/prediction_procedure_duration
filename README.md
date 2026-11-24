@@ -42,11 +42,11 @@ flowchart LR
     H --> G
 ```
 
-The primary entry point is **[`models/PAPER_ETC.py`](models/PAPER_ETC.py)**. It retains the model definitions from [`utils/models.py`](utils/models.py) and uses [`utils/paper_training.py`](utils/paper_training.py) for validation separation, padding-aware SMAPE, and training. The experiment is configured for **100 repeated trials**, **three outer folds**, and up to **1,000 epochs**. Details and the model settings are in the [methods guide](docs/methods.md).
+The primary entry point is **[`models/PAPER_ETC.py`](models/PAPER_ETC.py)**. It retains the model definitions from [`utils/models.py`](utils/models.py) and uses [`utils/paper_training.py`](utils/paper_training.py) for validation separation, padding aware SMAPE, and training. The experiment is configured for **100 repeated trials**, **three outer folds**, and up to **1,000 epochs**. Details and the model settings are in the [methods guide](docs/methods.md).
 
 ## Results in the publication
 
-The values below are **reported in Table 2 of the published paper** for one phase observation every 60 seconds. They have not been recomputed by the repository's automated tests.
+The values below are **reported in Table 2 of the published paper** for one phase observation every 60 seconds. 
 
 | Model | MAE (min) ↓ | SMAPE (%) ↓ |
 |:---|---:|---:|
@@ -59,7 +59,7 @@ The values below are **reported in Table 2 of the published paper** for one phas
 
 ![Comparison recreated from the published aggregate results at 60-second sampling](figures/published_60s_results.png)
 
-*The visualization uses published aggregate results; it is not a new model evaluation. This is a retrospective, single-center research study, not a clinically validated deployment.*
+*The visualization uses published aggregate results. This is a retrospective, single-center research study, not a clinically validated deployment.*
 
 ## Get started
 
@@ -121,10 +121,9 @@ python scripts/summarize_results.py models/runs/runs_PAPER_YYYYMMDD-HHMMSS
 python scripts/summarize_results.py models/runs/runs_PAPER_YYYYMMDD-HHMMSS --format csv
 ```
 
-The utility reports the number of completed folds; incomplete runs are not silently presented as full 100-trial results. See [outputs & analysis](docs/results.md). The original scripts in `tools/` are retained separately for historical analyses and plots.
+The utility reports the number of completed folds. Incomplete runs are not silently presented as full 100-trial results. See [outputs & analysis](docs/results.md). The original scripts in `tools/` are retained separately for historical analyses and plots.
 
 ## Scope and citation
 
-The public data files are anonymized procedure-level sequences. `X.csv` and `Y.csv` are not raw videos. The paper's published scores should be distinguished from any later training run; automated tests check preprocessing and repository behavior, **not the published numerical results**.
-
-The architecture definitions deliberately retain the research implementation, including non-causal convolution/pooling operations in some networks. A real-time, strictly causal system would require separate evaluation. Please cite the [published article](https://doi.org/10.1080/24699322.2025.2466426) when reusing the work; citation metadata are provided in [`CITATION.cff`](CITATION.cff).
+The public data files are anonymized procedure-level sequences. `X.csv` and `Y.csv` are not raw videos. 
+The definitions of the architecture deliberately retain the research implementation, including non-causal convolution/pooling operations in some networks. A real-time, strictly causal system would require separate evaluation. Please cite the [published article](https://doi.org/10.1080/24699322.2025.2466426) when reusing the work; citation metadata are provided in [`CITATION.cff`](CITATION.cff).
