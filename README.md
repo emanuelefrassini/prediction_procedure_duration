@@ -1,8 +1,8 @@
 <div align="center">
 
-# Clinical Procedure Duration Prediction
+# Prediction of the Duration of Clinical Procedures
 
-**Deep learning for phase-based estimation of the time remaining in coronary angiography procedures**
+**Deep learning phase-based estimation of the time remaining in coronary angiography procedures**
 
 [![Paper](https://img.shields.io/badge/Paper-Computer%20Assisted%20Surgery-275D89?style=flat-square)](https://doi.org/10.1080/24699322.2025.2466426)
 [![DOI](https://img.shields.io/badge/DOI-10.1080%2F24699322.2025.2466426-008C91?style=flat-square)](https://doi.org/10.1080/24699322.2025.2466426)
