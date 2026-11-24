@@ -30,17 +30,13 @@ The study investigates the **estimated time to completion (ETC)** of coronary an
 
 ## Experimental workflow
 
-```mermaid
-flowchart LR
-    A[Annotated clinical phases] --> B[Temporal sampling]
-    B --> C[Procedure-level cross-validation]
-    C --> D[Train / validation / test]
-    D --> E[Five neural architectures]
-    E --> F[Individual ETC predictions]
-    F --> G[MAE and SMAPE]
-    F --> H[InceptionTime + LSTM-FCN]
-    H --> G
-```
+<p align="center">
+  <img src="figures/icsu_a_2466426_f0001_c.jpg" alt="Clinical workflow views from the cardiac catheterization laboratory" width="100%">
+</p>
+
+<p align="center">
+  <em>Example views from the cardiac catheterization laboratory used for workflow analysis and procedure-duration prediction.</em>
+</p>
 
 The primary entry point is **[`models/PAPER_ETC.py`](models/PAPER_ETC.py)**. It retains the model definitions from [`utils/models.py`](utils/models.py) and uses [`utils/paper_training.py`](utils/paper_training.py) for validation separation, padding aware SMAPE, and training. The experiment is configured for **100 repeated trials**, **three outer folds**, and up to **1,000 epochs**. Details and the model settings are in the [methods guide](docs/methods.md).
 
