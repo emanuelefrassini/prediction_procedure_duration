@@ -1,4 +1,5 @@
 # Paper figures
+'icsu_a_2466426_f0001_c.jpg' shows the camera viewpoints of the cath lab interventional room.
 
 `published_60s_results.png` visualizes the aggregate MAE and SMAPE values reported in **Table 2** of [Frassini et al. (2025)](https://doi.org/10.1080/24699322.2025.2466426) at a 60-second sampling interval.
 
